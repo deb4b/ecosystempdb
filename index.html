@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizational Ecosystem</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light background */
+            color: #334155; /* Dark gray text */
+        }
+        .flow-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .flow-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .sub-component-card {
+            transition: background-color 0.2s ease-in-out;
+        }
+        .sub-component-card:hover {
+            background-color: #e2e8f0; /* Lighter gray on hover */
+        }
+        .hidden {
+            display: none;
+        }
+        /* Custom scrollbar for detailed info panel */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-6xl bg-white rounded-xl shadow-lg p-6 md:p-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">Organizational Ecosystem</h1>
+
+        <!-- Main Flow Grid -->
+        <div id="main-flows" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+            <!-- Flow cards will be dynamically inserted here by JavaScript -->
+        </div>
+
+        <!-- Sub-components Section (initially hidden) -->
+        <div id="sub-components-section" class="hidden bg-blue-50 rounded-lg p-6 mb-8 shadow-inner">
+            <button id="back-to-main" class="mb-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                &larr; Back to Main Flows
+            </button>
+            <h2 id="current-flow-title" class="text-2xl font-semibold text-blue-800 mb-4"></h2>
+            <p id="current-flow-description" class="text-gray-700 mb-6"></p>
+            <div id="sub-components-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <!-- Sub-component cards will be dynamically inserted here -->
+            </div>
+            <div id="flow-pic-info" class="mt-6 p-4 bg-blue-100 rounded-lg border border-blue-200">
+                <h3 class="text-lg font-semibold text-blue-700 mb-2">Person in Charge for this Flow:</h3>
+                <p class="text-gray-700">Name: <span id="flow-pic-name" class="font-medium"></span></p>
+                <p class="text-gray-700">Email: <span id="flow-pic-email" class="font-medium"></span></p>
+                <p class="text-gray-700">Phone: <span id="flow-pic-phone" class="font-medium"></span></p>
+                <a id="flow-pic-teams-link" href="#" target="_blank" class="inline-block mt-3 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-colors">
+                    Chat on Teams
+                </a>
+            </div>
+        </div>
+
+        <!-- Detailed Info Panel (initially hidden) -->
+        <div id="detailed-info-panel" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar relative">
+                <button id="close-detailed-info" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+                <h2 id="detailed-title" class="text-2xl md:text-3xl font-bold text-gray-800 mb-4"></h2>
+                <p id="detailed-description" class="text-gray-700 leading-relaxed mb-6"></p>
+
+                <div id="detailed-pic-info" class="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <h3 class="text-lg font-semibold text-purple-700 mb-2">Person in Charge:</h3>
+                    <p class="text-gray-700">Name: <span id="pic-name" class="font-medium"></span></p>
+                    <p class="text-gray-700">Email: <span id="pic-email" class="font-medium"></span></p>
+                    <p class="text-gray-700">Phone: <span id="pic-phone" class="font-medium"></span></p>
+                    <a id="pic-teams-link" href="#" target="_blank" class="inline-block mt-3 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-colors">
+                        Chat on Teams
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structure for the organizational ecosystem
+        const organizationData = {
+            "Terminal": {
+                description: "The central hub for logistics and initial processing of goods.",
+                pic: { name: "Alice Smith", email: "alice.smith@example.com", phone: "+1 (555) 123-4567" },
+                subComponents: [
+                    { name: "Logistics Hub", description: "Manages inbound and outbound freight, optimizing routes and schedules.", pic: { name: "Mark Davis", email: "mark.davis@example.com", phone: "+1 (555) 234-5678" } },
+                    { name: "Warehousing", description: "Storage facilities for various products, ensuring efficient inventory management.", pic: { name: "Sarah Miller", email: "sarah.miller@example.com", phone: "+1 (555) 345-6789" } }
+                ]
+            },
+            "Petrol Stations": {
+                description: "Our network of retail fuel outlets providing services to customers.",
+                pic: { name: "Bob Johnson", email: "bob.johnson@example.com", phone: "+1 (555) 987-6543" },
+                subComponents: [
+                    { name: "POS (Point of Sale)", description: "System for processing transactions, managing sales, and loyalty programs at the station.", pic: { name: "Carol White", email: "carol.white@example.com", phone: "+1 (555) 112-2334" } },
+                    { name: "IPT (Integrated Payment Terminal)", description: "Secure terminal for card payments, mobile payments, and electronic transactions at the pump and inside.", pic: { name: "David Green", email: "david.green@example.com", phone: "+1 (555) 554-4332" } },
+                    { name: "Fuel Management System", description: "Monitors fuel levels, deliveries, and ensures compliance with environmental regulations.", pic: { name: "Emily Clark", email: "emily.clark@example.com", phone: "+1 (555) 678-9012" } }
+                ]
+            },
+            "Office": {
+                description: "Our administrative and operational headquarters, housing various departments.",
+                pic: { name: "Eve Brown", email: "eve.brown@example.com", phone: "+1 (555) 098-7654" },
+                subComponents: [
+                    { name: "HR Department", description: "Manages human resources, recruitment, employee relations, and benefits.", pic: { name: "Michael Lee", email: "michael.lee@example.com", phone: "+1 (555) 789-0123" } },
+                    { name: "Finance Department", description: "Handles all financial operations, budgeting, accounting, and financial reporting.", pic: { name: "Jessica Taylor", email: "jessica.taylor@example.com", phone: "+1 (555) 890-1234" } },
+                    { name: "Marketing & Sales", description: "Develops strategies for brand promotion, customer acquisition, and sales growth.", pic: { name: "Chris Wilson", email: "chris.wilson@example.com", phone: "+1 (555) 901-2345" } }
+                ]
+            },
+            "Dealer Customer": {
+                description: "Our valued partners and clients who distribute and utilize our products and services.",
+                pic: { name: "Frank Black", email: "frank.black@example.com", phone: "+1 (555) 212-3434" },
+                subComponents: [
+                    { name: "Dealer Support Portal", description: "Online platform providing resources, training, and support for our dealer network.", pic: { name: "Olivia Martinez", email: "olivia.martinez@example.com", phone: "+1 (555) 321-4567" } },
+                    { name: "Customer Relationship Management (CRM)", description: "System used to manage and analyze customer interactions and data throughout the customer lifecycle.", pic: { name: "Daniel Harris", email: "daniel.harris@example.com", phone: "+1 (555) 432-5678" } }
+                ]
+            },
+            "Data Center": {
+                description: "Our centralized facility housing critical IT operations, servers, and network equipment.",
+                pic: { name: "Grace Lee", email: "grace.lee@example.com", phone: "+1 (555) 789-0123" },
+                subComponents: [
+                    { name: "Network Infrastructure", description: "Manages all network components, ensuring high-speed and reliable data transfer.", pic: { name: "Sophia Rodriguez", email: "sophia.rodriguez@example.com", phone: "+1 (555) 876-5432" } },
+                    { name: "Server Management", description: "Maintains and monitors all physical and virtual servers, ensuring optimal performance.", pic: { name: "Ethan Garcia", email: "ethan.garcia@example.com", phone: "+1 (555) 987-6543" } },
+                    { name: "Cybersecurity Operations", description: "Protects against cyber threats, monitors security incidents, and ensures data integrity.", pic: { name: "Ava Hernandez", email: "ava.hernandez@example.com", phone: "+1 (555) 012-3456" } }
+                ]
+            }
+        };
+
+        // Get DOM elements
+        const mainFlowsContainer = document.getElementById('main-flows');
+        const subComponentsSection = document.getElementById('sub-components-section');
+        const backToMainButton = document.getElementById('back-to-main');
+        const currentFlowTitle = document.getElementById('current-flow-title');
+        const currentFlowDescription = document.getElementById('current-flow-description');
+        const subComponentsGrid = document.getElementById('sub-components-grid');
+        const flowPicName = document.getElementById('flow-pic-name');
+        const flowPicEmail = document.getElementById('flow-pic-email');
+        const flowPicPhone = document.getElementById('flow-pic-phone');
+        const flowPicTeamsLink = document.getElementById('flow-pic-teams-link');
+        const flowPicInfo = document.getElementById('flow-pic-info');
+
+        const detailedInfoPanel = document.getElementById('detailed-info-panel');
+        const closeDetailedInfoButton = document.getElementById('close-detailed-info');
+        const detailedTitle = document.getElementById('detailed-title');
+        const detailedDescription = document.getElementById('detailed-description');
+        const picName = document.getElementById('pic-name');
+        const picEmail = document.getElementById('pic-email');
+        const picPhone = document.getElementById('pic-phone');
+        const picTeamsLink = document.getElementById('pic-teams-link');
+        const detailedPicInfo = document.getElementById('detailed-pic-info');
+
+        let currentFlow = null; // To keep track of the currently selected main flow
+
+        /**
+         * Generates the main flow cards and appends them to the container.
+         */
+        function renderMainFlows() {
+            mainFlowsContainer.innerHTML = ''; // Clear previous content
+            Object.keys(organizationData).forEach(flowName => {
+                const flowCard = document.createElement('div');
+                flowCard.className = 'flow-card bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-lg shadow-md cursor-pointer text-center flex flex-col items-center justify-center';
+                flowCard.innerHTML = `
+                    <h3 class="text-xl font-semibold mb-2">${flowName}</h3>
+                    <p class="text-sm opacity-90">${organizationData[flowName].description.split('.')[0]}.</p>
+                `;
+                flowCard.dataset.flow = flowName; // Store flow name for easy access
+                flowCard.addEventListener('click', () => showSubComponents(flowName));
+                mainFlowsContainer.appendChild(flowCard);
+            });
+            mainFlowsContainer.classList.remove('hidden');
+            subComponentsSection.classList.add('hidden');
+            detailedInfoPanel.classList.add('hidden');
+        }
+
+        /**
+         * Displays the sub-components for a given main flow.
+         * @param {string} flowName - The name of the main flow.
+         */
+        function showSubComponents(flowName) {
+            currentFlow = flowName;
+            const flowData = organizationData[flowName];
+
+            currentFlowTitle.textContent = flowName;
+            currentFlowDescription.textContent = flowData.description;
+
+            // Display PIC for the main flow
+            if (flowData.pic) {
+                flowPicName.textContent = flowData.pic.name;
+                flowPicEmail.textContent = flowData.pic.email;
+                flowPicPhone.textContent = flowData.pic.phone;
+                flowPicTeamsLink.href = `https://teams.microsoft.com/l/chat/0/0?users=${flowData.pic.email}`;
+                flowPicInfo.classList.remove('hidden');
+            } else {
+                flowPicInfo.classList.add('hidden');
+            }
+
+
+            subComponentsGrid.innerHTML = ''; // Clear previous sub-components
+            if (flowData.subComponents && flowData.subComponents.length > 0) {
+                flowData.subComponents.forEach(subComp => {
+                    const subCompCard = document.createElement('div');
+                    subCompCard.className = 'sub-component-card bg-white p-4 rounded-md shadow-sm border border-gray-200 cursor-pointer text-center';
+                    subCompCard.innerHTML = `
+                        <h4 class="text-lg font-medium text-gray-800 mb-1">${subComp.name}</h4>
+                        <p class="text-sm text-gray-600">${subComp.description.split('.')[0]}.</p>
+                    `;
+                    subCompCard.addEventListener('click', () => showDetailedInfo(subComp));
+                    subComponentsGrid.appendChild(subCompCard);
+                });
+            } else {
+                subComponentsGrid.innerHTML = '<p class="text-gray-600 text-center col-span-full">No specific sub-components listed for this flow, but you can contact the main flow PIC.</p>';
+            }
+
+            mainFlowsContainer.classList.add('hidden');
+            subComponentsSection.classList.remove('hidden');
+        }
+
+        /**
+         * Displays the detailed information panel for a sub-component.
+         * @param {object} item - The sub-component or main flow data.
+         */
+        function showDetailedInfo(item) {
+            detailedTitle.textContent = item.name;
+            detailedDescription.textContent = item.description;
+
+            if (item.pic) {
+                picName.textContent = item.pic.name;
+                picEmail.textContent = item.pic.email;
+                picPhone.textContent = item.pic.phone;
+                picTeamsLink.href = `https://teams.microsoft.com/l/chat/0/0?users=${item.pic.email}`;
+                detailedPicInfo.classList.remove('hidden');
+            } else {
+                detailedPicInfo.classList.add('hidden');
+            }
+
+            detailedInfoPanel.classList.remove('hidden');
+        }
+
+        // Event listeners
+        backToMainButton.addEventListener('click', renderMainFlows);
+        closeDetailedInfoButton.addEventListener('click', () => detailedInfoPanel.classList.add('hidden'));
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', renderMainFlows);
+    </script>
+</body>
+</html>
